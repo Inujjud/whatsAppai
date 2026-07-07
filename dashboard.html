@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة التحكم — واتس مخرج نجد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="logo-light.svg" />
+<style>
+:root{
+  --bg:#0A0C10; --bg2:#0E1218; --card:#12161E; --card2:#161B25; --input:#0B0E14;
+  --line:#222938; --line2:#2B3446;
+  --text:#EEF3F9; --muted:#9AA7B8; --dim:#6B7789;
+  --accent:#C9621E; --accent2:#E8843D; --accent-soft:rgba(232,132,61,.12);
+  --green:#25D366; --green-d:#1FA855; --warn:#F0A030; --err:#F85149; --ok:#3FB950;
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+a{text-decoration:none;color:inherit}
+[data-lucide]{width:1em;height:1em;stroke-width:2;vertical-align:-.13em}
+::selection{background:var(--accent);color:#fff}
+
+.app{display:flex;min-height:100vh}
+
+/* ============ Sidebar ============ */
+.sidebar{width:250px;background:var(--bg2);border-inline-end:1px solid var(--line);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:11px;padding:22px 20px 18px;border-bottom:1px solid var(--line)}
+.brand .logo-img{height:36px;width:auto;display:block}
+.brand b{display:block;font-size:14.5px;line-height:1.3}
+.brand small{color:var(--dim);font-size:11.5px}
+.nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.nav a{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:11px;color:var(--muted);
+  font-weight:500;font-size:14.5px;cursor:pointer;transition:.18s;position:relative}
+.nav a:hover{background:var(--card);color:var(--text)}
+.nav a.active{background:var(--accent-soft);color:var(--accent2);font-weight:700}
+.nav a.active::before{content:"";position:absolute;inset-inline-start:-12px;top:22%;bottom:22%;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.nav a .ico{display:inline-flex}
+.nav a .ico svg{width:19px;height:19px;stroke-width:2}
+.badge{margin-inline-start:auto;background:var(--err);color:#fff;font-size:11px;font-weight:800;
+  min-width:20px;height:20px;border-radius:10px;display:none;place-items:center;padding:0 6px;line-height:20px;text-align:center}
+.side-foot{padding:14px 12px;border-top:1px solid var(--line)}
+.side-foot button{width:100%;background:none;border:1px solid var(--line);border-radius:11px;color:var(--muted);
+  padding:11px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;transition:.18s}
+.side-foot button:hover{border-color:var(--err);color:var(--err)}
+.side-foot button svg{width:16px;height:16px;vertical-align:-3px;margin-inline-end:6px}
+
+/* ============ Main ============ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;
+  padding:0 26px;background:rgba(10,12,16,.7);backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+.topbar h1{font-size:19px;font-weight:800}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:99px;font-size:12.5px;font-weight:700;margin-inline-start:auto}
+.pill .dot{width:8px;height:8px;border-radius:50%}
+.pill.on{background:rgba(37,211,102,.12);color:var(--green);border:1px solid rgba(37,211,102,.3)}
+.pill.on .dot{background:var(--green);box-shadow:0 0 8px var(--green)}
+.pill.off{background:rgba(248,81,73,.1);color:var(--err);border:1px solid rgba(248,81,73,.3)}
+.pill.off .dot{background:var(--err)}
+.content{padding:26px;flex:1;max-width:1120px;width:100%;margin:0 auto}
+.section{display:none;animation:fadeUp .35s}
+.section.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ============ Cards & forms ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+h2.t{font-size:17px;font-weight:800;margin-bottom:4px}
+h2.t svg{width:19px;height:19px;vertical-align:-3px;stroke-width:2;color:var(--accent2);margin-inline-end:6px}
+.sub{color:var(--muted);font-size:13.5px;line-height:1.8;margin-bottom:14px}
+label{display:block;font-size:13.5px;font-weight:700;margin:14px 0 7px;color:var(--muted)}
+label svg{width:15px;height:15px;vertical-align:-2px;stroke-width:2.2;margin-inline-end:3px}
+.hint{color:var(--dim);font-weight:400;font-size:12px}
+input,textarea,select{width:100%;padding:12px 14px;background:var(--input);border:1px solid var(--line);
+  border-radius:11px;color:var(--text);font-size:14.5px;transition:.2s;font-family:inherit}
+input::placeholder,textarea::placeholder{color:var(--dim)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,98,30,.16)}
+textarea{min-height:88px;resize:vertical;line-height:1.75}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bar{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;cursor:pointer;
+  border-radius:11px;font-weight:700;font-size:14.5px;padding:12px 22px;transition:.2s;font-family:inherit;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#160D04}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,98,30,.3)}
+.btn.sec{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn.sec:hover{border-color:var(--accent2);color:var(--accent2);box-shadow:none}
+.btn.sm{padding:8px 14px;font-size:13px;border-radius:9px}
+.btn svg{width:16px;height:16px;stroke-width:2.2}
+
+/* ============ Stats ============ */
+.grid.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stat{display:flex;flex-direction:column;gap:2px;padding:22px}
+.stat .ico{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:12px}
+.stat .ico svg{width:20px;height:20px;stroke-width:2;color:var(--accent2)}
+.stat .n{font-size:30px;font-weight:900;line-height:1.2}
+.stat .l{color:var(--muted);font-size:13px;font-weight:500}
+.alert{display:flex;align-items:center;gap:10px;background:rgba(240,160,48,.1);border:1px solid rgba(240,160,48,.35);
+  color:var(--warn);border-radius:13px;padding:14px 16px;font-size:14px;margin-bottom:16px}
+.alert svg{width:18px;height:18px;flex-shrink:0;stroke-width:2.2}
+.alert b{color:var(--text)}
+
+/* ============ Chart ============ */
+.chart{display:flex;align-items:flex-end;gap:10px;height:170px;padding-top:24px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+.chart .bar2{width:100%;max-width:36px;background:linear-gradient(180deg,var(--accent2),var(--accent));
+  border-radius:8px 8px 3px 3px;min-height:4px;transition:.3s;position:relative}
+.chart .bar2:hover{filter:brightness(1.15)}
+.chart .bar2 b{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted)}
+.chart .lbl{font-size:10.5px;color:var(--dim);font-weight:600}
+
+/* ============ Items (QA/Flows/KB) ============ */
+.item{display:flex;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:14px;margin-top:10px}
+.item .g{flex:1;display:grid;gap:8px}
+.item .g input,.item .g textarea{background:var(--input)}
+.item .g textarea{min-height:64px}
+.item .x{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;align-self:flex-start;padding:2px 8px;border-radius:8px;transition:.15s}
+.item .x:hover{color:var(--err);background:rgba(248,81,73,.1)}
+.chip{display:inline-block;background:var(--accent-soft);color:var(--accent2);font-size:11.5px;font-weight:700;
+  padding:3px 10px;border-radius:99px;margin-bottom:4px;width:fit-content}
+
+/* ============ Toggles ============ */
+.tg{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px;
+  background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+.tg .txt b{display:block;font-size:14.5px}
+.tg .txt span{color:var(--muted);font-size:12.5px;line-height:1.6;display:block;margin-top:2px}
+.switch{position:relative;width:46px;height:26px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--line2);border-radius:99px;transition:.25s}
+.slider:before{content:"";position:absolute;height:20px;width:20px;right:3px;top:3px;background:#fff;border-radius:50%;transition:.25s}
+.switch input:checked + .slider{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.switch input:checked + .slider:before{transform:translateX(-20px)}
+
+/* ============ Inbox ============ */
+.inbox{display:grid;grid-template-columns:330px 1fr;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);overflow:hidden;height:calc(100vh - 170px);min-height:480px}
+.conv-tools{padding:12px;border-bottom:1px solid var(--line);display:grid;gap:9px}
+.conv-tools input{padding:10px 13px;font-size:13.5px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters .f{padding:5px 12px;border-radius:99px;border:1px solid var(--line);color:var(--muted);cursor:pointer;
+  font-size:12px;font-weight:700;transition:.18s}
+.filters .f.active{background:var(--accent-soft);border-color:rgba(232,132,61,.4);color:var(--accent2)}
+.filters .f svg{width:12px;height:12px;vertical-align:-2px;margin-inline-end:3px}
+.conv-list{overflow-y:auto}
+.conv{padding:13px 15px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s}
+.conv:hover{background:var(--card2)}
+.conv.active{background:var(--accent-soft);border-inline-start:3px solid var(--accent)}
+.conv .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.conv .name{font-weight:700;font-size:14px}
+.conv .prev{color:var(--dim);font-size:12.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:99px;flex-shrink:0}
+.tag.bot{background:rgba(37,211,102,.12);color:var(--green)}
+.tag.human{background:rgba(240,160,48,.14);color:var(--warn)}
+.tag.resolved{background:rgba(154,167,184,.12);color:var(--muted)}
+.stars .on{color:#F0A030}.stars .off{color:var(--line2)}
+.chat{display:flex;flex-direction:column;min-width:0;border-inline-start:1px solid var(--line)}
+.chat-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card2)}
+.chat-head .nm{font-weight:800;font-size:15px}
+.msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:9px;background:var(--bg)}
+.bubble{max-width:70%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.75;word-break:break-word}
+.bubble.user{background:var(--card2);border:1px solid var(--line);align-self:flex-start;border-bottom-right-radius:4px}
+.bubble.assistant{background:#0E3B2E;border:1px solid #14513F;align-self:flex-end;border-bottom-left-radius:4px}
+.bubble img{max-width:230px;border-radius:10px;display:block;margin-bottom:6px;cursor:pointer}
+.bubble .meta{color:var(--dim);font-size:11px;margin-top:5px}
+.media-link{color:var(--accent2);font-size:13px}
+.quick-bar{display:flex;gap:7px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);background:var(--card2)}
+.quick-bar .q{background:var(--input);border:1px solid var(--line2);color:var(--muted);font-size:12.5px;
+  padding:6px 13px;border-radius:99px;cursor:pointer;transition:.15s}
+.quick-bar .q:hover{border-color:var(--accent2);color:var(--accent2)}
+.chat-foot{display:flex;gap:9px;padding:12px 14px;border-top:1px solid var(--line);background:var(--card2)}
+.chat-foot input{flex:1}
+.empty{color:var(--dim);font-size:14px;text-align:center;padding:60px 20px}
+.empty svg{width:34px;height:34px;stroke-width:1.6;color:var(--dim);display:block;margin:0 auto 12px}
+
+/* ============ Webhook box ============ */
+.webhook-box{background:#0B1512;color:#7EE2A8;font-family:monospace;font-size:12.5px;padding:13px 14px;
+  border:1px solid #14513F;border-radius:11px;word-break:break-all;margin-top:8px;direction:ltr;text-align:left}
+
+/* ============ Builder drawer ============ */
+.drawer-mask{position:fixed;inset:0;background:rgba(5,7,10,.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.drawer-mask.show{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;inset-inline-start:-420px;width:400px;max-width:94vw;background:var(--bg2);
+  border-inline-end:1px solid var(--line2);z-index:61;transition:.3s cubic-bezier(.2,.7,.3,1);display:flex;flex-direction:column}
+.drawer.show{inset-inline-start:0}
+.drawer-head{background:linear-gradient(135deg,var(--accent),var(--accent2));padding:18px 20px;color:#160D04;display:flex;justify-content:space-between;align-items:flex-start}
+.drawer-head b{font-size:16px;display:block}
+.drawer-head small{font-size:12.5px;opacity:.85;display:block;margin-top:2px;font-weight:600}
+.drawer-head svg{width:19px;height:19px;vertical-align:-3px}
+.drawer-head .close{background:none;border:none;font-size:24px;color:#160D04;cursor:pointer;line-height:1}
+.drawer-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.bmsg{max-width:85%;padding:10px 14px;border-radius:13px;font-size:13.5px;line-height:1.8}
+.bmsg.bot{background:var(--card2);border:1px solid var(--line);align-self:flex-start;border-bottom-right-radius:4px}
+.bmsg.me{background:var(--accent-soft);border:1px solid rgba(232,132,61,.3);align-self:flex-end;border-bottom-left-radius:4px}
+.typing{color:var(--dim);font-size:12.5px;padding:4px 8px}
+.drawer-apply{padding:12px 18px 0}
+.drawer-foot{display:flex;gap:9px;padding:14px 18px;border-top:1px solid var(--line)}
+.drawer-foot input{flex:1}
+
+/* ============ Toast ============ */
+.toast{position:fixed;bottom:26px;inset-inline-start:50%;transform:translate(50%,80px);background:var(--card2);
+  border:1px solid var(--line2);color:var(--text);padding:13px 24px;border-radius:13px;font-size:14px;font-weight:600;
+  box-shadow:0 16px 50px rgba(0,0,0,.5);opacity:0;transition:.3s;z-index:99;pointer-events:none}
+.toast.show{opacity:1;transform:translate(50%,0)}
+
+@media(max-width:880px){
+  .sidebar{width:70px}
+  .brand{justify-content:center;padding:18px 8px}
+  .brand div,.side-foot button span{display:none}
+  .nav a{justify-content:center;padding:12px}
+  .nav a .tx{display:none}
+  .badge{position:absolute;top:4px;inset-inline-end:6px;margin:0}
+  .side-foot button{font-size:0}
+  .side-foot button svg{margin:0;font-size:16px}
+  .inbox{grid-template-columns:1fr;height:auto}
+  .chat{min-height:420px;border-inline-start:none;border-top:1px solid var(--line)}
+  .row,.grid.stats{grid-template-columns:1fr}
+  .content{padding:16px}
+  .drawer{width:100%}
+}
+@media(min-width:881px) and (max-width:1100px){.grid.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ Sidebar ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="logo-img" viewBox="-20 -20 2244 1292"><path transform="translate(0,709) scale(1.0,-1.0)" d="M709 0H513L252 394V0H56V705H252L513 306V705H709Z" fill="#F2F5F9"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/><path transform="translate(0,1251.65) scale(0.85,-0.85)" d="M252 548V433H477V284H252V157H507V0H56V705H507V548Z" fill="#E8951F"/><path transform="translate(447.325,1251.65) scale(0.85,-0.85)" d="M497 0 360 199 243 0H20L249 361L12 705H243L376 511L490 705H713L487 350L728 0Z" fill="#E8951F"/><path transform="translate(1097.0,1251.65) scale(0.85,-0.85)" d="M0 705H360V590H278V115H360V0H0V115H82V590H0Z" fill="#E8951F"/><path transform="translate(1650.6,1251.65) scale(0.85,-0.85)" d="M587 705V549H399V0H203V549H17V705Z" fill="#E8951F"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/></svg>
+      <div><b id="bizName">نشاطك</b><small>واتس مخرج نجد</small></div>
+    </div>
+    <nav class="nav">
+      <a data-tab="overview" class="active"><span class="ico"><i data-lucide="layout-dashboard"></i></span><span class="tx">نظرة عامة</span></a>
+      <a data-tab="persona"><span class="ico"><i data-lucide="bot"></i></span><span class="tx">شخصية البوت</span></a>
+      <a data-tab="knowledge"><span class="ico"><i data-lucide="book-open"></i></span><span class="tx">قاعدة المعرفة</span></a>
+      <a data-tab="flows"><span class="ico"><i data-lucide="git-branch"></i></span><span class="tx">المسارات الذكية</span></a>
+      <a data-tab="inbox"><span class="ico"><i data-lucide="message-square"></i></span><span class="tx">الإنبوكس</span><span class="badge" id="inboxBadge">0</span></a>
+      <a data-tab="settings"><span class="ico"><i data-lucide="settings"></i></span><span class="tx">الإعدادات</span></a>
+    </nav>
+    <div class="side-foot"><button onclick="logout()"><i data-lucide="log-out"></i><span> تسجيل خروج</span></button></div>
+  </aside>
+
+  <!-- ============ Main ============ -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">نظرة عامة</h1>
+      <span class="pill off" id="botPill"><span class="dot"></span> البوت متوقف</span>
+    </div>
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <section class="section active" id="overview">
+        <div id="humanAlert"></div>
+        <div class="grid stats">
+          <div class="card stat"><span class="ico"><i data-lucide="send"></i></span><div class="n" id="s_today">0</div><div class="l">رسائل اليوم</div></div>
+          <div class="card stat"><span class="ico"><i data-lucide="messages-square"></i></span><div class="n" id="s_total">0</div><div class="l">إجمالي المحادثات</div></div>
+          <div class="card stat"><span class="ico"><i data-lucide="user-plus"></i></span><div class="n" id="s_week">0</div><div class="l">عملاء هذا الأسبوع</div></div>
+          <div class="card stat"><span class="ico"><i data-lucide="hand"></i></span><div class="n" id="s_human" style="color:var(--warn)">0</div><div class="l">تحتاج تدخّلك</div></div>
+          <div class="card stat"><span class="ico"><i data-lucide="star"></i></span><div class="n" id="s_rating" style="color:#F0A030">—</div><div class="l">متوسط التقييم <span id="s_rating_count" style="font-size:11px"></span></div></div>
+          <div class="card stat"><span class="ico"><i data-lucide="repeat"></i></span><div class="n" id="s_handoff">0%</div><div class="l">نسبة التحويل البشري</div></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="trending-up"></i> الرسائل في آخر ٧ أيام</h2>
+          <p class="sub">عدد الرسائل الواردة يومياً.</p>
+          <div class="chart" id="msgChart"></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="sparkles"></i> جاهز للانطلاق؟</h2>
+          <p class="sub">اضبط شخصية البوت، أضف معلومات نشاطك في قاعدة المعرفة، وفعّل البوت من الإعدادات.</p>
+          <div class="bar">
+            <button class="btn" onclick="go('persona')"><i data-lucide="bot"></i> اضبط الشخصية</button>
+            <button class="btn sec" onclick="go('knowledge')"><i data-lucide="book-open"></i> أضف معلومات</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERSONA -->
+      <section class="section" id="persona">
+        <div class="card">
+          <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <h2 class="t"><i data-lucide="bot"></i> شخصية البوت</h2>
+              <p class="sub">عرّف البوت كأنه موظف حقيقي — كيف يتكلم، وش دوره، وش يسوي وش ما يسوي.</p>
+            </div>
+            <button class="btn" onclick="openBuilder()"><i data-lucide="sparkles"></i> ساعدني أبني شخصية البوت</button>
+          </div>
+          <div class="row">
+            <div><label>أفاتار البوت <span class="hint">(إيموجي)</span></label><input id="bot_avatar" maxlength="2" value="🤖" style="text-align:center;font-size:22px"></div>
+            <div><label>اسم البوت</label><input id="bot_name" placeholder="مثال: سارة"></div>
+          </div>
+          <label>دور البوت <span class="hint">(وظيفته)</span></label>
+          <input id="bot_role" placeholder="مثال: موظفة خدمة عملاء واستقبال حجوزات">
+          <label>النبرة والأسلوب</label>
+          <input id="bot_tone" placeholder="مثال: ودود، محترف، مختصر، يستخدم لهجة بيضاء">
+          <label>معلومات النشاط <span class="hint">(نبذة عامة)</span></label>
+          <textarea id="business_info" placeholder="وصف نشاطك، خدماتك الرئيسية، أوقات العمل، الموقع..."></textarea>
+          <div class="row">
+            <div><label><i data-lucide="circle-check"></i> يجب أن يفعل دائماً</label><textarea id="dos" placeholder="- يرحّب بأدب&#10;- يسأل عن احتياج العميل"></textarea></div>
+            <div><label><i data-lucide="circle-slash"></i> ممنوع عليه</label><textarea id="donts" placeholder="- لا يعطي أسعار غير مؤكدة&#10;- لا يعد بمواعيد"></textarea></div>
+          </div>
+          <label>رسالة الترحيب</label>
+          <input id="welcome_message" placeholder="أهلاً بك! كيف أقدر أساعدك؟">
+
+          <div style="margin-top:22px">
+            <label style="display:flex;justify-content:space-between;align-items:center">أمثلة ردود جاهزة <button class="btn sec sm" onclick="addQA()">+ إضافة مثال</button></label>
+            <p class="sub" style="margin-top:4px">علّم البوت كيف يرد على أسئلة شائعة (سؤال ← الرد المثالي).</p>
+            <div id="qaList"></div>
+          </div>
+          <div class="bar"><button class="btn" onclick="saveAll('تم حفظ الشخصية ✅')"><i data-lucide="save"></i> حفظ</button></div>
+        </div>
+      </section>
+
+      <!-- KNOWLEDGE -->
+      <section class="section" id="knowledge">
+        <div class="card">
+          <h2 class="t"><i data-lucide="book-open"></i> قاعدة المعرفة</h2>
+          <p class="sub">كل ما تضيفه هنا، يرد منه البوت بدقة بدل ما يخمّن. أضف خدماتك، أسعارك، أسئلة شائعة.</p>
+          <div class="row">
+            <div><label>التصنيف <span class="hint">(اختياري)</span></label><input id="kb_cat" placeholder="مثال: الأسعار / الخدمات / المواعيد"></div>
+            <div><label>العنوان</label><input id="kb_title" placeholder="مثال: أسعار الباقات"></div>
+          </div>
+          <label>المحتوى</label>
+          <textarea id="kb_content" placeholder="اكتب المعلومة كاملة هنا..."></textarea>
+          <div class="bar"><button class="btn" onclick="addKB()">+ أضف للمعرفة</button></div>
+          <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
+          <div id="kbList"></div>
+        </div>
+      </section>
+
+      <!-- FLOWS -->
+      <section class="section" id="flows">
+        <div class="card">
+          <h2 class="t"><i data-lucide="git-branch"></i> المسارات الذكية</h2>
+          <p class="sub">البوت ذكي ويرد بحرية، لكن للمهام المهمة (حجز، طلب، أسعار) عرّف مسار جاهز يتبعه.</p>
+          <label style="display:flex;justify-content:space-between;align-items:center">المسارات <button class="btn sec sm" onclick="addFlow()">+ مسار جديد</button></label>
+          <div id="flowList" style="margin-top:10px"></div>
+          <div class="bar"><button class="btn" onclick="saveAll('تم حفظ المسارات ✅')"><i data-lucide="save"></i> حفظ</button></div>
+        </div>
+      </section>
+
+      <!-- INBOX -->
+      <section class="section" id="inbox">
+        <div class="inbox">
+          <div style="display:flex;flex-direction:column;min-height:0">
+            <div class="conv-tools">
+              <input id="convSearch" placeholder="ابحث بالاسم أو الرقم..." oninput="renderConvList()">
+              <div class="filters" id="convFilters">
+                <span class="f active" data-f="all" onclick="setFilter('all')">الكل</span>
+                <span class="f" data-f="human" onclick="setFilter('human')"><i data-lucide="hand"></i> تدخّل</span>
+                <span class="f" data-f="bot" onclick="setFilter('bot')"><i data-lucide="bot"></i> آلي</span>
+                <span class="f" data-f="resolved" onclick="setFilter('resolved')"><i data-lucide="check"></i> منتهية</span>
+              </div>
+            </div>
+            <div class="conv-list" id="convList" style="flex:1"></div>
+          </div>
+          <div class="chat" id="chatArea"><div class="empty"><i data-lucide="mouse-pointer-click"></i> اختر محادثة لعرضها</div></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="section" id="settings">
+        <div class="card">
+          <h2 class="t"><i data-lucide="link"></i> ربط الواتساب</h2>
+          <p class="sub">اربط رقم واتساب الأعمال الخاص بك بضغطة واحدة عبر نافذة ميتا الرسمية.</p>
+          <div id="waNotConnected">
+            <button class="btn" onclick="launchWhatsAppSignup()"><i data-lucide="link"></i> ربط واتساب الأعمال</button>
+            <p class="hint" style="margin-top:10px;display:block">بتفتح نافذة من ميتا تسجّل دخولك، تختار رقمك، وتوافق على الربط. كل شيء يتم تلقائياً.</p>
+          </div>
+          <div id="waConnected" style="display:none">
+            <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.3);border-radius:13px;padding:14px 16px">
+              <b style="color:var(--green)"><i data-lucide="circle-check" style="vertical-align:-3px;width:17px;height:17px"></i> واتساب مربوط</b>
+              <div class="hint" style="margin-top:6px;display:block">معرّف الرقم: <span id="waPhoneId">—</span></div>
+            </div>
+            <button class="btn sec sm" style="margin-top:12px" onclick="launchWhatsAppSignup()"><i data-lucide="refresh-cw"></i> إعادة الربط برقم آخر</button>
+          </div>
+          <span id="connRes" style="display:block;margin-top:10px;font-size:13px"></span>
+          <label style="margin-top:18px">رابط الويبهوك <span class="hint">(للاستخدام التقني — يُضبط تلقائياً)</span></label>
+          <div class="webhook-box" id="webhookBox">—</div>
+          <input type="hidden" id="ultramsg_instance">
+          <input type="hidden" id="ultramsg_token">
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="hand"></i> التسليم للمسؤول</h2>
+          <p class="sub">لما يجي سؤال خارج النطاق، البوت يوقف ويحوّل المحادثة لك.</p>
+          <div class="tg"><div class="txt"><b>تفعيل التسليم للمسؤول</b><span>البوت يحوّل الأسئلة الخارجة عن نطاق الخدمة</span></div>
+            <label class="switch"><input type="checkbox" id="handoff_enabled" checked><span class="slider"></span></label></div>
+          <label>رقمك لاستقبال التنبيهات <span class="hint">(واتساب، بصيغة دولية بدون +)</span></label>
+          <input id="owner_phone" placeholder="9665xxxxxxxx">
+          <div class="tg"><div class="txt"><b>تنبيهي عند عميل جديد</b><span>أستلم رسالة واتساب أول ما يبدأ عميل جديد محادثة</span></div>
+            <label class="switch"><input type="checkbox" id="notify_on_new" checked><span class="slider"></span></label></div>
+          <label>كلمات تفعّل التحويل فوراً <span class="hint">(افصل بفاصلة)</span></label>
+          <input id="handoff_keywords" placeholder="موظف, إنسان, شكوى, أبي أكلم أحد">
+          <label>رسالة التحويل للعميل</label>
+          <input id="handoff_message" placeholder="لحظة من فضلك، بحوّلك لأحد موظفينا 🙏">
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="mic"></i> الرسائل الصوتية</h2>
+          <p class="sub">يفهم البوت الرسائل الصوتية الواردة ويحوّلها لنص.</p>
+          <div class="tg"><div class="txt"><b>فهم الرسائل الصوتية</b><span id="voiceNote">يتطلب إضافة مفتاح تحويل صوت على الخادم</span></div>
+            <label class="switch"><input type="checkbox" id="voice_enabled"><span class="slider"></span></label></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="star"></i> تقييم الخدمة بعد المحادثة</h2>
+          <p class="sub">عند إنهاء المحادثة، يُرسل البوت رسالة تقييم تلقائياً، وتظهر النتيجة في نظرة عامة وداخل كل محادثة.</p>
+          <div class="tg" style="margin-top:0"><div class="txt"><b>تفعيل التقييم التلقائي</b><span>إرسال سؤال التقييم عند الضغط على «إنهاء»</span></div>
+            <label class="switch"><input type="checkbox" id="rating_enabled" checked><span class="slider"></span></label></div>
+          <label>سؤال التقييم <span class="hint">(يُرسل للعميل)</span></label>
+          <textarea id="rating_question" placeholder="كيف تقيّم خدمتنا من ١ إلى ٥ نجوم؟ (أرسل رقم من 1 إلى 5)"></textarea>
+          <label>رسالة الشكر بعد التقييم</label>
+          <input id="rating_thanks" placeholder="شكراً لتقييمك! نسعد بخدمتك دائماً ❤️">
+          <label>رسالة الإنهاء <span class="hint">(تُرسل لو التقييم مغلق)</span></label>
+          <input id="end_message" placeholder="تم إنهاء المحادثة. سعدنا بخدمتك 🌟">
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="clock"></i> ساعات العمل</h2>
+          <p class="sub">خارج هذه الساعات، يرد البوت برسالة آلية بدل الرد على الاستفسار.</p>
+          <div class="tg" style="margin-top:0"><div class="txt"><b>تفعيل ساعات العمل</b><span>رسالة تلقائية خارج أوقات الدوام (بتوقيت السعودية)</span></div>
+            <label class="switch"><input type="checkbox" id="working_hours_enabled"><span class="slider"></span></label></div>
+          <div class="row">
+            <div><label>من الساعة</label><input id="working_hours_start" type="time" value="09:00"></div>
+            <div><label>إلى الساعة</label><input id="working_hours_end" type="time" value="22:00"></div>
+          </div>
+          <label>رسالة خارج الدوام</label>
+          <textarea id="working_hours_message" placeholder="شكراً لتواصلك 🌙 نحن خارج ساعات العمل حالياً، وسنرد عليك في أقرب وقت ضمن ساعات العمل."></textarea>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="rotate-ccw"></i> الإرجاع التلقائي للبوت</h2>
+          <p class="sub">إذا تدخّلت في محادثة ولم تتفاعل لفترة، يرجع البوت تلقائياً للرد على العميل.</p>
+          <label>مدة السكون قبل الإرجاع <span class="hint">(بالدقائق — 0 لتعطيلها)</span></label>
+          <input id="auto_return_minutes" type="number" min="0" value="30" style="max-width:160px">
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="zap"></i> الردود السريعة</h2>
+          <p class="sub">جُمل جاهزة تظهر فوق صندوق الرد في الإنبوكس لإرسالها بضغطة.</p>
+          <label style="display:flex;justify-content:space-between;align-items:center">الردود <button class="btn sec sm" onclick="addQuick()">+ إضافة رد</button></label>
+          <div id="quickList" style="margin-top:10px"></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="tg" style="margin-top:0"><div class="txt"><b>تشغيل البوت</b><span>عند الإيقاف، البوت لا يرد على أي رسالة</span></div>
+            <label class="switch"><input type="checkbox" id="is_active"><span class="slider"></span></label></div>
+          <div class="bar"><button class="btn" onclick="saveAll('تم حفظ الإعدادات ✅')"><i data-lucide="save"></i> حفظ كل الإعدادات</button></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h2 class="t"><i data-lucide="lock"></i> تغيير كلمة المرور</h2>
+          <p class="sub">حدّث كلمة مرور دخولك للوحة التحكم. استخدم كلمة مرور قوية لا تقل عن 6 أحرف.</p>
+          <label>كلمة المرور الحالية</label>
+          <input id="cp_current" type="password" placeholder="••••••••" autocomplete="current-password">
+          <label>كلمة المرور الجديدة</label>
+          <input id="cp_new" type="password" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+          <label>تأكيد كلمة المرور الجديدة</label>
+          <input id="cp_confirm" type="password" placeholder="أعد كتابتها" autocomplete="new-password">
+          <div class="bar"><button class="btn" onclick="changePassword()"><i data-lucide="key-round"></i> تحديث كلمة المرور</button></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ AI Builder Drawer ============ -->
+<div class="drawer-mask" id="builderMask" onclick="closeBuilder()"></div>
+<aside class="drawer" id="builderDrawer">
+  <div class="drawer-head">
+    <div><i data-lucide="sparkles"></i> <b>مساعد بناء الشخصية</b><small>جاوب على أسئلتي وأجهّز لك البوت</small></div>
+    <button class="close" onclick="closeBuilder()">×</button>
+  </div>
+  <div class="drawer-body" id="builderBody"></div>
+  <div class="drawer-apply" id="builderApply" style="display:none">
+    <button class="btn" style="width:100%" onclick="applyBuilder()"><i data-lucide="check"></i> طبّق الإعدادات على الحقول</button>
+  </div>
+  <div class="drawer-foot">
+    <input id="builderInput" placeholder="اكتب ردك هنا..." onkeydown="if(event.key==='Enter')sendBuilder()">
+    <button class="btn" onclick="sendBuilder()">إرسال</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "https://nnujud.app.n8n.cloud/webhook"; // محرّك n8n
+const clientId = localStorage.getItem("client_id");
+const bizName = localStorage.getItem("business_name") || "نشاطك";
+if(!clientId){ location.href = "login.html"; }
+
+let QA = [];      // أمثلة الردود
+let FLOWS = [];   // المسارات
+let CONVS = [];   // المحادثات
+let QUICK = [];   // الردود السريعة
+let activeConv = null;
+let convFilter = "all";
+
+// ---------- أدوات ----------
+const $ = id => document.getElementById(id);
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2200); }
+async function api(path, opts){ const r = await fetch(API+path, opts); return r.json(); }
+
+// ---------- ربط واتساب (التسجيل المدمج من ميتا) ----------
+const FB_APP_ID = "2579504252446297";
+const FB_CONFIG_ID = "3892297714237972";
+const FB_GRAPH_VERSION = "v21.0";
+let _waSession = {};
+
+window.fbAsyncInit = function(){
+  FB.init({ appId: FB_APP_ID, autoLogAppEvents:true, xfbml:true, version: FB_GRAPH_VERSION });
+};
+(function(d, s, id){
+  if(d.getElementById(id)) return;
+  const js = d.createElement(s); js.id = id;
+  js.src = "https://connect.facebook.net/en_US/sdk.js";
+  d.getElementsByTagName("head")[0].appendChild(js);
+}(document, "script", "facebook-jssdk"));
+
+window.addEventListener("message", function(event){
+  if(event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") return;
+  try{
+    const data = JSON.parse(event.data);
+    if(data.type === "WA_EMBEDDED_SIGNUP" && data.event === "FINISH"){
+      _waSession = { phone_number_id: data.data.phone_number_id, waba_id: data.data.waba_id };
+    }
+  }catch(e){ /* رسائل أخرى من فيسبوك — تُتجاهل */ }
+});
+
+function launchWhatsAppSignup(){
+  if(typeof FB === "undefined"){ toast("نافذة ميتا لم تُحمّل بعد، حاول بعد لحظات"); return; }
+  $("connRes").style.color = "var(--muted)";
+  $("connRes").textContent = "جارٍ فتح نافذة ميتا...";
+  FB.login(function(response){
+    const code = response && response.authResponse && response.authResponse.code;
+    if(!code){ $("connRes").style.color="var(--err)"; $("connRes").textContent="أُلغي الربط أو لم يكتمل."; return; }
+    finishWhatsAppConnect(code);
+  }, {
+    config_id: FB_CONFIG_ID,
+    response_type: "code",
+    override_default_response_type: true,
+    extras: { setup: {}, featureType: "", sessionInfoVersion: "3" }
+  });
+}
+
+async function finishWhatsAppConnect(code){
+  $("connRes").style.color = "var(--muted)";
+  $("connRes").textContent = "جارٍ إكمال الربط...";
+  try{
+    const r = await api("/api/connect-whatsapp",{ method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ client_id: clientId, code: code, waba_id: _waSession.waba_id||"", phone_number_id: _waSession.phone_number_id||"" }) });
+    if(r.success){
+      $("connRes").style.color = "var(--ok)";
+      $("connRes").textContent = "✅ تم ربط واتساب بنجاح";
+      toast("تم ربط واتساب بنجاح ✅");
+      loadSettings();
+    } else {
+      $("connRes").style.color = "var(--err)";
+      $("connRes").textContent = "تعذّر الربط: " + (r.error||"خطأ غير معروف");
+    }
+  }catch(e){ $("connRes").style.color="var(--err)"; $("connRes").textContent="تعذّر الاتصال بالخادم"; }
+}
+function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function starsHTML(n,max){ max=max||5; n=Math.round(n||0); let h=""; for(let i=1;i<=max;i++){ h+=`<span class="${i<=n?'on':'off'}">★</span>`; } return `<span class="stars">${h}</span>`; }
+
+// ---------- تنقّل ----------
+const titles={overview:"نظرة عامة",persona:"شخصية البوت",knowledge:"قاعدة المعرفة",flows:"المسارات الذكية",inbox:"الإنبوكس",settings:"الإعدادات"};
+document.querySelectorAll(".nav a").forEach(a=>a.onclick=()=>go(a.dataset.tab));
+function go(tab){
+  document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("active",a.dataset.tab===tab));
+  document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===tab));
+  $("pageTitle").textContent=titles[tab];
+  if(tab==="inbox"){ unreadNew=0; refreshInboxBadge(); loadInbox(); }
+  if(tab==="overview") loadStats();
+}
+function logout(){ localStorage.clear(); location.href="login.html"; }
+
+// ---------- إحصائيات ----------
+async function loadStats(){
+  try{
+    const d = await api(`/api/stats/${clientId}`);
+    $("s_today").textContent=d.messages_today||0;
+    $("s_total").textContent=d.total_conversations||0;
+    $("s_week").textContent=d.new_customers_week||0;
+    $("s_human").textContent=d.needs_human||0;
+    $("s_rating").textContent = d.ratings_count ? (d.avg_rating||0) : "—";
+    $("s_rating_count").textContent = d.ratings_count ? `(${d.ratings_count} تقييم)` : "";
+    $("s_handoff").textContent = (d.handoff_rate||0)+"%";
+    renderChart(d.daily||[]);
+    const pill=$("botPill");
+    pill.className = "pill "+(d.bot_active?"on":"off");
+    pill.innerHTML = `<span class="dot"></span> ${d.bot_active?"البوت يعمل":"البوت متوقف"}`;
+    window.__needsHuman = d.needs_human||0;
+    refreshInboxBadge();
+    $("humanAlert").innerHTML = d.needs_human>0
+      ? `<div class="alert"><i data-lucide="hand"></i> لديك <b>${d.needs_human}</b> محادثة تحتاج تدخّلك. <button class="btn sm" style="margin-inline-start:auto" onclick="go('inbox')">افتح الإنبوكس</button></div>` : "";
+    if(window.lucide) lucide.createIcons();
+  }catch(e){ console.error(e); }
+}
+const DAY_AR=["أحد","إثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"];
+function renderChart(daily){
+  const el=$("msgChart"); if(!el) return;
+  if(!daily.length){ el.innerHTML='<p class="sub">لا توجد بيانات بعد.</p>'; return; }
+  const max=Math.max(1,...daily.map(x=>x.count||0));
+  el.innerHTML = daily.map(x=>{
+    const h=Math.round(((x.count||0)/max)*100);
+    const dn=DAY_AR[new Date(x.date+"T00:00:00").getDay()];
+    return `<div class="col"><div class="bar2" style="height:${Math.max(h,2)}%"><b>${x.count||0}</b></div><div class="lbl">${dn}</div></div>`;
+  }).join("");
+}
+
+// ---------- تحميل الإعدادات ----------
+async function loadSettings(){
+  try{
+    const d = await api(`/api/settings/${clientId}`);
+    const s = d.settings||{};
+    $("bot_avatar").value = s.bot_avatar||"🤖";
+    $("bot_name").value = s.bot_name||"";
+    $("bot_role").value = s.bot_role||"";
+    $("bot_tone").value = s.bot_tone||s.bot_personality||"";
+    $("business_info").value = s.business_info||"";
+    $("dos").value = s.dos||"";
+    $("donts").value = s.donts||"";
+    $("welcome_message").value = s.welcome_message||"";
+    $("ultramsg_instance").value = s.ultramsg_instance||"";
+    if(s.meta_phone_number_id){
+      $("waConnected").style.display="block";
+      $("waNotConnected").style.display="none";
+      $("waPhoneId").textContent = s.meta_phone_number_id;
+    } else {
+      $("waConnected").style.display="none";
+      $("waNotConnected").style.display="block";
+    }
+    $("owner_phone").value = s.owner_phone||"";
+    $("notify_on_new").checked = s.notify_on_new!==false;
+    $("handoff_keywords").value = s.handoff_keywords||"";
+    $("handoff_message").value = s.handoff_message||"";
+    $("handoff_enabled").checked = s.handoff_enabled!==false;
+    $("voice_enabled").checked = !!s.voice_enabled;
+    $("is_active").checked = !!s.is_active;
+    $("rating_enabled").checked = s.rating_enabled!==false;
+    $("rating_question").value = s.rating_question||"";
+    $("rating_thanks").value = s.rating_thanks||"";
+    $("end_message").value = s.end_message||"";
+    $("working_hours_enabled").checked = !!s.working_hours_enabled;
+    $("working_hours_start").value = s.working_hours_start||"09:00";
+    $("working_hours_end").value = s.working_hours_end||"22:00";
+    $("working_hours_message").value = s.working_hours_message||"";
+    $("auto_return_minutes").value = (s.auto_return_minutes!=null)?s.auto_return_minutes:30;
+    QA = Array.isArray(s.sample_qa)?s.sample_qa:[];
+    FLOWS = Array.isArray(s.flows)?s.flows:[];
+    QUICK = Array.isArray(s.quick_replies)?s.quick_replies:[];
+    renderQA(); renderFlows(); renderQuick();
+    $("webhookBox").textContent = d.webhook_url||"—";
+    if(!d.voice_engine){
+      $("voiceNote").innerHTML = "⚠️ يتطلب إضافة مفتاح تحويل صوت على الخادم لتشغيل هذه الميزة";
+    } else { $("voiceNote").textContent = "مُفعّل وجاهز ✅"; }
+  }catch(e){ console.error(e); }
+}
+
+function collect(){
+  return {
+    client_id: clientId, business_name: bizName,
+    bot_avatar:$("bot_avatar").value, bot_name:$("bot_name").value,
+    bot_role:$("bot_role").value, bot_tone:$("bot_tone").value,
+    business_info:$("business_info").value, dos:$("dos").value, donts:$("donts").value,
+    welcome_message:$("welcome_message").value,
+    sample_qa:QA, flows:FLOWS,
+    ultramsg_instance:$("ultramsg_instance").value,
+    ultramsg_token:$("ultramsg_token").value,
+    owner_phone:$("owner_phone").value,
+    notify_on_new:$("notify_on_new").checked,
+    handoff_enabled:$("handoff_enabled").checked,
+    handoff_keywords:$("handoff_keywords").value,
+    handoff_message:$("handoff_message").value,
+    voice_enabled:$("voice_enabled").checked,
+    is_active:$("is_active").checked,
+    rating_enabled:$("rating_enabled").checked,
+    rating_question:$("rating_question").value,
+    rating_thanks:$("rating_thanks").value,
+    end_message:$("end_message").value,
+    working_hours_enabled:$("working_hours_enabled").checked,
+    working_hours_start:$("working_hours_start").value,
+    working_hours_end:$("working_hours_end").value,
+    working_hours_message:$("working_hours_message").value,
+    auto_return_minutes:parseInt($("auto_return_minutes").value)||0,
+    quick_replies:QUICK.filter(q=>(q||"").trim()),
+  };
+}
+async function saveAll(msg){
+  try{
+    const r = await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(collect())});
+    if(r.success){ toast(msg||"تم الحفظ ✅"); $("ultramsg_token").value=""; loadStats(); $("webhookBox").textContent=r.webhook_url||$("webhookBox").textContent; }
+    else toast("خطأ: "+(r.error||"تعذّر الحفظ"));
+  }catch(e){ toast("تعذّر الاتصال بالخادم"); }
+}
+
+// ---------- تغيير كلمة المرور ----------
+async function changePassword(){
+  const cur = $("cp_current").value.trim();
+  const nw  = $("cp_new").value.trim();
+  const cf  = $("cp_confirm").value.trim();
+  if(!cur || !nw){ toast("اكتب كلمة المرور الحالية والجديدة"); return; }
+  if(nw.length < 6){ toast("كلمة المرور الجديدة 6 أحرف على الأقل"); return; }
+  if(nw !== cf){ toast("تأكيد كلمة المرور لا يطابق"); return; }
+  try{
+    const r = await api("/api/change-password",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({client_id:clientId, current_password:cur, new_password:nw})});
+    if(r.success){
+      toast("تم تغيير كلمة المرور بنجاح ✅");
+      $("cp_current").value=""; $("cp_new").value=""; $("cp_confirm").value="";
+    } else toast("خطأ: "+(r.error||"تعذّر التغيير"));
+  }catch(e){ toast("تعذّر الاتصال بالخادم"); }
+}
+
+// ---------- أمثلة الردود (QA) ----------
+function renderQA(){
+  $("qaList").innerHTML = QA.map((x,i)=>`
+    <div class="item"><div class="g">
+      <input placeholder="السؤال" value="${esc(x.q)}" oninput="QA[${i}].q=this.value">
+      <textarea placeholder="الرد المثالي" oninput="QA[${i}].a=this.value">${esc(x.a)}</textarea>
+    </div><button class="x" onclick="QA.splice(${i},1);renderQA()">×</button></div>`).join("")
+    || `<p class="sub">لا توجد أمثلة بعد.</p>`;
+}
+function addQA(){ QA.push({q:"",a:""}); renderQA(); }
+
+// ---------- المسارات ----------
+function renderFlows(){
+  $("flowList").innerHTML = FLOWS.map((f,i)=>`
+    <div class="item"><div class="g">
+      <input placeholder="متى؟ (مثال: حجز موعد)" value="${esc(f.trigger)}" oninput="FLOWS[${i}].trigger=this.value">
+      <textarea placeholder="ماذا يفعل البوت؟ (الخطوات)" oninput="FLOWS[${i}].action=this.value">${esc(f.action)}</textarea>
+    </div><button class="x" onclick="FLOWS.splice(${i},1);renderFlows()">×</button></div>`).join("")
+    || `<p class="sub">لا توجد مسارات بعد. أضف مسار للمهام المهمة.</p>`;
+}
+function addFlow(){ FLOWS.push({trigger:"",action:""}); renderFlows(); }
+
+// ---------- الردود السريعة ----------
+function renderQuick(){
+  $("quickList").innerHTML = QUICK.map((q,i)=>`
+    <div class="item"><div class="g">
+      <input placeholder="نص الرد السريع" value="${esc(q)}" oninput="QUICK[${i}]=this.value">
+    </div><button class="x" onclick="QUICK.splice(${i},1);renderQuick()">×</button></div>`).join("")
+    || `<p class="sub">لا توجد ردود سريعة بعد.</p>`;
+}
+function addQuick(){ QUICK.push(""); renderQuick(); }
+
+// ---------- قاعدة المعرفة ----------
+async function loadKB(){
+  const d = await api(`/api/knowledge/${clientId}`);
+  const items = d.items||[];
+  $("kbList").innerHTML = items.length ? items.map(it=>`
+    <div class="item"><div class="g">
+      ${it.category?`<span class="chip">${esc(it.category)}</span>`:""}
+      <b>${esc(it.title)}</b><span style="color:var(--muted);font-size:13px;line-height:1.7">${esc(it.content)}</span>
+    </div><button class="x" onclick="delKB('${it.id}')">×</button></div>`).join("")
+    : `<p class="sub">قاعدة المعرفة فارغة. أضف أول معلومة فوق ☝️</p>`;
+}
+async function addKB(){
+  const title=$("kb_title").value.trim(), content=$("kb_content").value.trim();
+  if(!title||!content){ toast("اكتب العنوان والمحتوى"); return; }
+  const r = await api("/api/knowledge",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({client_id:clientId,category:$("kb_cat").value.trim(),title,content})});
+  if(r.success){ $("kb_cat").value="";$("kb_title").value="";$("kb_content").value=""; toast("أُضيفت ✅"); loadKB(); }
+  else toast("خطأ: "+(r.error||""));
+}
+async function delKB(id){
+  if(!confirm("حذف هذه المعلومة؟"))return;
+  await api(`/api/knowledge/${id}`,{method:"DELETE"}); loadKB();
+}
+
+// ---------- الإنبوكس ----------
+async function loadInbox(){
+  const d = await api(`/api/conversations/${clientId}`);
+  CONVS = d.conversations||[];
+  renderConvList();
+}
+function renderConvList(){
+  const sb=$("convSearch"); const q=(sb?sb.value:"").trim().toLowerCase();
+  let list = CONVS;
+  if(convFilter!=="all") list = list.filter(c=>(c.status||"bot")===convFilter);
+  if(q) list = list.filter(c=>(c.customer_name||"").toLowerCase().includes(q)||(c.customer_phone||"").includes(q));
+  $("convList").innerHTML = list.length ? list.map(c=>`
+    <div class="conv ${activeConv===c.id?'active':''}" onclick="openConv('${c.id}')">
+      <div class="top"><span class="name">${esc(c.customer_name||c.customer_phone)}</span>
+        <span class="tag ${c.status||'bot'}">${c.status==='human'?'تدخّل':c.status==='resolved'?'منتهية':'بوت'}</span></div>
+      <div class="prev">${esc(c.last_message)}</div>
+      ${c.rating?`<div style="margin-top:4px">${starsHTML(c.rating)}</div>`:""}
+    </div>`).join("") : `<div class="empty">لا توجد محادثات مطابقة</div>`;
+}
+function setFilter(f){
+  convFilter=f;
+  document.querySelectorAll("#convFilters .f").forEach(el=>el.classList.toggle("active",el.dataset.f===f));
+  renderConvList();
+}
+function mediaHTML(url){
+  if(!url) return "";
+  const u = esc(url);
+  if(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i.test(url))
+    return `<img src="${u}" onclick="window.open('${u}','_blank')" alt="صورة">`;
+  return `<a class="media-link" href="${u}" target="_blank">📎 فتح المرفق</a><br>`;
+}
+function openConv(id){
+  activeConv=id; renderConvList();
+  const c = CONVS.find(x=>x.id===id); if(!c)return;
+  const msgs=(c.messages||[]).map(m=>`
+    <div class="bubble ${m.role==='user'?'user':'assistant'}">${mediaHTML(m.media)}${esc(m.content)}
+      ${m.system_note?`<div class="meta">• ${esc(m.system_note)}</div>`:""}</div>`).join("");
+  const statusBtns = c.status==='human'
+    ? `<button class="btn sm" onclick="setHandoff('${c.customer_phone}','bot')"><i data-lucide="corner-down-left"></i> إرجاع للبوت</button>
+       <button class="btn sm sec" onclick="setHandoff('${c.customer_phone}','resolved')"><i data-lucide="check"></i> إنهاء المحادثة</button>`
+    : c.status==='resolved'
+    ? `<button class="btn sm sec" onclick="setHandoff('${c.customer_phone}','human')"><i data-lucide="hand"></i> تولّي المحادثة</button>`
+    : `<button class="btn sm sec" onclick="setHandoff('${c.customer_phone}','human')"><i data-lucide="hand"></i> تولّي المحادثة</button>
+       <button class="btn sm sec" onclick="setHandoff('${c.customer_phone}','resolved')"><i data-lucide="check"></i> إنهاء المحادثة</button>`;
+  const ratingTag = c.rating ? `<span style="margin-inline-start:6px">${starsHTML(c.rating)}</span>` : "";
+  const quickBar = QUICK.length ? `<div class="quick-bar">${QUICK.map((q,i)=>`<span class="q" onclick="insertQuick(${i})">${esc(q)}</span>`).join("")}</div>` : "";
+  $("chatArea").innerHTML = `
+    <div class="chat-head"><span class="nm">${esc(c.customer_name||c.customer_phone)}</span>
+      <span class="tag ${c.status||'bot'}" style="margin-inline-start:6px">${c.status==='human'?'تدخّل بشري':c.status==='resolved'?'منتهية':'آلي'}</span>
+      ${ratingTag}
+      <span style="margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap">${statusBtns}</span></div>
+    <div class="msgs" id="msgs">${msgs||'<div class="empty">لا رسائل</div>'}</div>
+    ${quickBar}
+    <div class="chat-foot">
+      <input id="replyBox" placeholder="اكتب رداً يدوياً..." onkeydown="if(event.key==='Enter')sendReply('${c.customer_phone}')">
+      <button class="btn" onclick="sendReply('${c.customer_phone}')">إرسال</button>
+    </div>`;
+  scrollMsgs();
+  if(window.lucide) lucide.createIcons();
+}
+function insertQuick(i){
+  const box=$("replyBox"); if(!box) return;
+  box.value = QUICK[i]||"";
+  box.focus();
+}
+function scrollMsgs(){
+  const m=$("msgs"); if(!m) return;
+  m.scrollTop=m.scrollHeight;
+  m.querySelectorAll("img").forEach(img=>{ if(!img.complete) img.onload=()=>{ m.scrollTop=m.scrollHeight; }; });
+  setTimeout(()=>{ m.scrollTop=m.scrollHeight; }, 120);
+}
+async function sendReply(phone){
+  const box=$("replyBox"); const text=box.value.trim(); if(!text)return;
+  box.value=""; box.disabled=true;
+  const r = await api("/api/reply",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({client_id:clientId,customer_phone:phone,message:text})});
+  box.disabled=false;
+  if(r.success){ await loadInbox(); openConv(activeConv); }
+  else toast("فشل الإرسال: "+(r.error||""));
+}
+async function setHandoff(phone,status){
+  const r = await api("/api/handoff",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({client_id:clientId,customer_phone:phone,status})});
+  if(r.success){ toast("تم التحديث ✅"); await loadInbox(); openConv(activeConv); loadStats(); }
+}
+
+// ---------- مساعد بناء الشخصية (AI Builder) ----------
+let BMSGS = [];
+let pendingSettings = null;
+
+function openBuilder(){
+  $("builderMask").classList.add("show");
+  $("builderDrawer").classList.add("show");
+  if(BMSGS.length===0){
+    BMSGS = [{role:"assistant", content:"هلا 🤖 وش نوع نشاطك ووش أهم خدمة تقدّمها؟"}];
+  }
+  renderBuilder();
+  setTimeout(()=>{ const i=$("builderInput"); if(i) i.focus(); }, 250);
+}
+function closeBuilder(){
+  $("builderMask").classList.remove("show");
+  $("builderDrawer").classList.remove("show");
+}
+function renderBuilder(typing){
+  const body=$("builderBody");
+  body.innerHTML = BMSGS.map(m=>`<div class="bmsg ${m.role==='user'?'me':'bot'}">${esc(m.content)}</div>`).join("")
+    + (typing?`<div class="typing" id="bTyping">… يكتب</div>`:"");
+  body.scrollTop = body.scrollHeight;
+}
+async function sendBuilder(){
+  const box=$("builderInput"); const text=box.value.trim(); if(!text) return;
+  box.value=""; box.disabled=true;
+  BMSGS.push({role:"user", content:text});
+  renderBuilder(true);
+  try{
+    const r = await api("/api/builder-chat",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({client_id:clientId, business_name:bizName,
+        messages:BMSGS.map(m=>({role:m.role,content:m.content}))})});
+    BMSGS.push({role:"assistant", content:r.reply||"…"});
+    renderBuilder();
+    if(r.settings){
+      pendingSettings = r.settings;
+      $("builderApply").style.display="block";
+    }
+  }catch(e){
+    BMSGS.push({role:"assistant", content:"تعذّر الاتصال، حاول مرة ثانية 🙏"});
+    renderBuilder();
+  }
+  box.disabled=false; box.focus();
+}
+function applyBuilder(){
+  const s = pendingSettings; if(!s) return;
+  if(s.bot_name!==undefined) $("bot_name").value = s.bot_name||"";
+  if(s.bot_role!==undefined) $("bot_role").value = s.bot_role||"";
+  if(s.bot_tone!==undefined) $("bot_tone").value = s.bot_tone||"";
+  if(s.business_info!==undefined) $("business_info").value = s.business_info||"";
+  if(s.dos!==undefined) $("dos").value = s.dos||"";
+  if(s.donts!==undefined) $("donts").value = s.donts||"";
+  if(s.welcome_message!==undefined) $("welcome_message").value = s.welcome_message||"";
+  if(Array.isArray(s.sample_qa)){
+    QA = s.sample_qa.filter(x=>x && (x.q||x.a)).map(x=>({q:x.q||"",a:x.a||""}));
+    renderQA();
+  }
+  closeBuilder();
+  toast("تم تعبئة الحقول ✅ راجعها واضغط حفظ");
+}
+
+// ---------- إشعارات الرسائل الجديدة ----------
+let seenCounts = null;
+let unreadNew = 0;
+
+function askNotifyPermission(){
+  try{
+    if("Notification" in window && Notification.permission==="default"){
+      Notification.requestPermission();
+    }
+  }catch(e){}
+}
+function notifyDesktop(title, body){
+  try{
+    if("Notification" in window && Notification.permission==="granted"){
+      const n = new Notification(title, {body, icon:"logo.png", tag:"wa-"+Date.now()});
+      n.onclick = ()=>{ window.focus(); go("inbox"); n.close(); };
+    }
+  }catch(e){}
+}
+function refreshInboxBadge(){
+  const badge=$("inboxBadge");
+  const n = (window.__needsHuman||0) + unreadNew;
+  if(n>0){ badge.style.display="grid"; badge.textContent=n; }
+  else badge.style.display="none";
+}
+async function pollNew(){
+  try{
+    const d = await api(`/api/conversations/${clientId}`);
+    const convs = d.conversations||[];
+    if(seenCounts===null){
+      seenCounts = {}; convs.forEach(c=>seenCounts[c.id]=c.message_count||0);
+      return;
+    }
+    let newCount=0;
+    convs.forEach(c=>{
+      const prev = seenCounts[c.id];
+      const cur = c.message_count||0;
+      const isNewMsg = (prev===undefined && cur>0) || (prev!==undefined && cur>prev);
+      if(isNewMsg){
+        const msgs=c.messages||[];
+        const last=msgs[msgs.length-1];
+        if(last && last.role==="user"){
+          newCount++;
+          notifyDesktop("💬 رسالة جديدة من "+(c.customer_name||c.customer_phone),
+                        (last.content||"📎 مرفق").slice(0,90));
+        }
+      }
+      seenCounts[c.id]=cur;
+    });
+    if(newCount>0){
+      unreadNew += newCount;
+      refreshInboxBadge();
+      if(document.getElementById("inbox").classList.contains("active")){
+        CONVS = convs;
+        if(activeConv) openConv(activeConv);
+        else loadInbox();
+      }
+    }
+  }catch(e){ /* تجاهل أخطاء الاتصال المؤقتة */ }
+}
+
+// ---------- بدء ----------
+$("bizName").textContent = bizName;
+askNotifyPermission();
+loadStats(); loadSettings(); loadKB();
+pollNew();
+setInterval(loadStats, 30000);
+setInterval(pollNew, 10000);
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
