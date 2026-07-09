@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>لوحة الإدارة — واتس مخرج نجد</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="logo-light.svg" />
+<style>
+:root{
+  --bg:#0A0C10; --bg2:#0E1218; --card:#12161E; --card2:#161B25; --input:#0B0E14;
+  --line:#222938; --line2:#2B3446;
+  --text:#EEF3F9; --muted:#9AA7B8; --dim:#6B7789;
+  --accent:#C9621E; --accent2:#E8843D; --accent-soft:rgba(232,132,61,.12);
+  --green:#25D366; --warn:#F0A030; --err:#F85149; --ok:#3FB950;
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+[data-lucide]{width:1em;height:1em;stroke-width:2;vertical-align:-.13em}
+::selection{background:var(--accent);color:#fff}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(800px 420px at 80% -8%, rgba(201,98,30,.1), transparent 60%)}
+
+/* ===== بوابة الدخول ===== */
+.gate{min-height:100vh;display:grid;place-items:center;padding:22px}
+.gate .box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:36px 32px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.45);position:relative;z-index:1}
+.gate svg.logo{height:56px;width:auto;margin-bottom:18px}
+.gate h1{font-size:20px;font-weight:900;margin-bottom:6px}
+.gate p{color:var(--muted);font-size:13.5px;margin-bottom:22px;line-height:1.7}
+.gate input{width:100%;padding:13px 14px;background:var(--input);border:1px solid var(--line);border-radius:11px;
+  color:var(--text);font-size:15px;text-align:center;font-family:inherit;letter-spacing:1px}
+.gate input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,98,30,.16)}
+.gate .err{color:var(--err);font-size:13px;margin-top:12px;display:none}
+
+/* ===== الأزرار ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;cursor:pointer;
+  border-radius:11px;font-weight:700;font-size:14.5px;padding:12px 22px;transition:.2s;font-family:inherit;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#160D04}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(201,98,30,.3)}
+.btn.sec{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn.sec:hover{border-color:var(--accent2);color:var(--accent2);box-shadow:none}
+.btn.w{width:100%;margin-top:16px}
+
+/* ===== اللوحة ===== */
+.panel{display:none;max-width:1160px;margin:0 auto;padding:26px 22px 60px;position:relative;z-index:1}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:26px;flex-wrap:wrap}
+.topbar svg.logo{height:38px;width:auto}
+.topbar h1{font-size:20px;font-weight:900}
+.topbar .left{margin-inline-start:auto;display:flex;gap:9px}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.stat .ico{width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:12px}
+.stat .ico svg{width:19px;height:19px;color:var(--accent2)}
+.stat .n{font-size:28px;font-weight:900;line-height:1.2}
+.stat .l{color:var(--muted);font-size:12.5px;font-weight:500;margin-top:2px}
+.stat.mrr{background:linear-gradient(160deg,rgba(201,98,30,.14),var(--card) 60%);border-color:rgba(201,98,30,.4)}
+.stat.mrr .n{color:var(--accent2)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;margin-top:16px}
+h2.t{font-size:16.5px;font-weight:800;margin-bottom:14px}
+h2.t svg{width:18px;height:18px;vertical-align:-3px;color:var(--accent2);margin-inline-end:6px}
+
+/* توزيع الباقات */
+.plans-bar{display:flex;border-radius:10px;overflow:hidden;height:14px;background:var(--input);margin-bottom:14px}
+.plans-bar div{transition:.4s}
+.plans-legend{display:flex;gap:20px;flex-wrap:wrap}
+.plans-legend .lg{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.plans-legend .dot{width:10px;height:10px;border-radius:3px}
+.plans-legend b{color:var(--text)}
+
+/* جدول العملاء */
+.tools{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.tools input{flex:1;min-width:200px;padding:11px 14px;background:var(--input);border:1px solid var(--line);
+  border-radius:11px;color:var(--text);font-size:14px;font-family:inherit}
+.tools input:focus{outline:none;border-color:var(--accent)}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+th{background:var(--card2);color:var(--muted);font-weight:700;text-align:right;padding:12px 14px;font-size:12.5px;white-space:nowrap}
+td{padding:12px 14px;border-top:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.015)}
+td b{font-size:14px}
+td .em{color:var(--dim);font-size:12px;display:block;margin-top:1px;direction:ltr;text-align:right}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:800;white-space:nowrap}
+.pill .d{width:7px;height:7px;border-radius:50%}
+.pill.trial{background:rgba(154,167,184,.12);color:var(--muted)}
+.pill.basic{background:rgba(63,185,80,.1);color:var(--ok)}
+.pill.pro{background:var(--accent-soft);color:var(--accent2)}
+.pill.business{background:rgba(139,92,246,.14);color:#A78BFA}
+.pill.on{background:rgba(37,211,102,.1);color:var(--green)}
+.pill.on .d{background:var(--green)}
+.pill.off{background:rgba(248,81,73,.09);color:var(--err)}
+.pill.off .d{background:var(--err)}
+.pill.gray{background:rgba(154,167,184,.1);color:var(--dim)}
+.pill.gray .d{background:var(--dim)}
+.empty{color:var(--dim);text-align:center;padding:40px}
+
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ============ بوابة الدخول ============ -->
+<div class="gate" id="gate">
+  <div class="box">
+    <svg class="logo" viewBox="-20 -20 2244 1292"><path transform="translate(0,709) scale(1.0,-1.0)" d="M709 0H513L252 394V0H56V705H252L513 306V705H709Z" fill="#F2F5F9"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/><path transform="translate(0,1251.65) scale(0.85,-0.85)" d="M252 548V433H477V284H252V157H507V0H56V705H507V548Z" fill="#E8951F"/><path transform="translate(447.325,1251.65) scale(0.85,-0.85)" d="M497 0 360 199 243 0H20L249 361L12 705H243L376 511L490 705H713L487 350L728 0Z" fill="#E8951F"/><path transform="translate(1097.0,1251.65) scale(0.85,-0.85)" d="M0 705H360V590H278V115H360V0H0V115H82V590H0Z" fill="#E8951F"/><path transform="translate(1650.6,1251.65) scale(0.85,-0.85)" d="M587 705V549H399V0H203V549H17V705Z" fill="#E8951F"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/></svg>
+    <h1>لوحة الإدارة</h1>
+    <p>هذه المنطقة خاصة بإدارة منصة واتس مخرج نجد.<br>أدخل مفتاح الإدارة للمتابعة.</p>
+    <input type="password" id="adminKey" placeholder="مفتاح الإدارة" onkeydown="if(event.key==='Enter')enter()" autocomplete="off" />
+    <button class="btn w" onclick="enter()">دخول</button>
+    <div class="err" id="gateErr">المفتاح غير صحيح</div>
+  </div>
+</div>
+
+<!-- ============ اللوحة ============ -->
+<div class="panel" id="panel">
+  <div class="topbar">
+    <svg class="logo" viewBox="-20 -20 2244 1292"><path transform="translate(0,709) scale(1.0,-1.0)" d="M709 0H513L252 394V0H56V705H252L513 306V705H709Z" fill="#F2F5F9"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/><path transform="translate(0,1251.65) scale(0.85,-0.85)" d="M252 548V433H477V284H252V157H507V0H56V705H507V548Z" fill="#E8951F"/><path transform="translate(447.325,1251.65) scale(0.85,-0.85)" d="M497 0 360 199 243 0H20L249 361L12 705H243L376 511L490 705H713L487 350L728 0Z" fill="#E8951F"/><path transform="translate(1097.0,1251.65) scale(0.85,-0.85)" d="M0 705H360V590H278V115H360V0H0V115H82V590H0Z" fill="#E8951F"/><path transform="translate(1650.6,1251.65) scale(0.85,-0.85)" d="M587 705V549H399V0H203V549H17V705Z" fill="#E8951F"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/></svg>
+    <h1>لوحة إدارة المنصة</h1>
+    <div class="left">
+      <button class="btn sec" onclick="load()"><i data-lucide="refresh-cw"></i> تحديث</button>
+      <button class="btn sec" onclick="logout()"><i data-lucide="log-out"></i> خروج</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="stat mrr"><span class="ico"><i data-lucide="banknote"></i></span><div class="n" id="t_mrr">0</div><div class="l">الإيراد الشهري المتكرر (ر.س)</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="users"></i></span><div class="n" id="t_clients">0</div><div class="l">إجمالي العملاء</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="user-check"></i></span><div class="n" id="t_active">0</div><div class="l">حسابات نشطة</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="link"></i></span><div class="n" id="t_connected">0</div><div class="l">واتساب مربوط</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="bot"></i></span><div class="n" id="t_bots">0</div><div class="l">بوتات تعمل الآن</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="messages-square"></i></span><div class="n" id="t_convs">0</div><div class="l">إجمالي المحادثات</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="send"></i></span><div class="n" id="t_msgs">0</div><div class="l">إجمالي الرسائل</div></div>
+    <div class="stat"><span class="ico"><i data-lucide="hourglass"></i></span><div class="n" id="t_trial">0</div><div class="l">في الفترة التجريبية</div></div>
+  </div>
+
+  <div class="card">
+    <h2 class="t"><i data-lucide="pie-chart"></i> توزيع الباقات</h2>
+    <div class="plans-bar" id="plansBar"></div>
+    <div class="plans-legend" id="plansLegend"></div>
+  </div>
+
+  <div class="card">
+    <h2 class="t"><i data-lucide="users"></i> العملاء</h2>
+    <div class="tools">
+      <input id="q" placeholder="ابحث بالاسم أو البريد أو نوع النشاط..." oninput="renderTable()" />
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>النشاط</th><th>النوع</th><th>الباقة</th><th>واتساب</th><th>البوت</th><th>المحادثات</th><th>تاريخ التسجيل</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="7" class="empty">جارٍ التحميل…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://nnujud.app.n8n.cloud/webhook"; // محرّك n8n
+const $ = id => document.getElementById(id);
+let DATA = null;
+
+const PLAN_COLORS = { trial:"#9AA7B8", basic:"#3FB950", pro:"#E8843D", business:"#A78BFA" };
+const PLAN_AR = { trial:"تجريبي", basic:"البداية", pro:"النمو", business:"الأعمال" };
+
+function getKey(){ return sessionStorage.getItem("njd_admin_key") || ""; }
+
+function enter(){
+  const k = $("adminKey").value.trim();
+  if(!k) return;
+  sessionStorage.setItem("njd_admin_key", k);
+  $("gateErr").style.display = "none";
+  load();
+}
+function logout(){
+  sessionStorage.removeItem("njd_admin_key");
+  $("panel").style.display = "none";
+  $("gate").style.display = "grid";
+  $("adminKey").value = "";
+}
+function backToGate(msg){
+  sessionStorage.removeItem("njd_admin_key");
+  $("panel").style.display = "none";
+  $("gate").style.display = "grid";
+  $("gateErr").textContent = msg || "المفتاح غير صحيح";
+  $("gateErr").style.display = "block";
+}
+
+async function load(){
+  const key = getKey();
+  if(!key) return;
+  try{
+    const r = await fetch(API + "/api/admin/overview", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ admin_key: key })
+    });
+    const d = await r.json();
+    if(d.error && String(d.error).includes("مفتاح")){ backToGate(d.error); return; }
+    if(!r.ok || d.error){ backToGate(d.error || "تعذّر التحميل"); return; }
+    DATA = d;
+    $("gate").style.display = "none";
+    $("panel").style.display = "block";
+    render();
+  }catch(e){
+    backToGate("تعذّر الاتصال بالخادم");
+  }
+}
+
+function fmt(n){ return (n||0).toLocaleString("ar-SA"); }
+
+function render(){
+  const t = DATA.totals || {};
+  $("t_mrr").textContent = fmt(t.mrr);
+  $("t_clients").textContent = fmt(t.clients);
+  $("t_active").textContent = fmt(t.active_clients);
+  $("t_connected").textContent = fmt(t.connected);
+  $("t_bots").textContent = fmt(t.active_bots);
+  $("t_convs").textContent = fmt(t.conversations);
+  $("t_msgs").textContent = fmt(t.messages);
+
+  const plans = DATA.plans || {};
+  const labels = DATA.plan_labels || PLAN_AR;
+  $("t_trial").textContent = fmt(plans.trial);
+
+  const total = Object.values(plans).reduce((a,b)=>a+(b||0),0) || 1;
+  $("plansBar").innerHTML = Object.keys(plans).map(k=>
+    `<div style="width:${((plans[k]||0)/total*100)}%;background:${PLAN_COLORS[k]||'#555'}"></div>`).join("");
+  $("plansLegend").innerHTML = Object.keys(plans).map(k=>
+    `<span class="lg"><span class="dot" style="background:${PLAN_COLORS[k]||'#555'}"></span>${labels[k]||k}: <b>${fmt(plans[k])}</b></span>`).join("");
+
+  renderTable();
+  if(window.lucide) lucide.createIcons();
+}
+
+function esc(s){ return (s||"").toString().replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+function renderTable(){
+  const q = ($("q").value||"").trim().toLowerCase();
+  let list = (DATA && DATA.clients) || [];
+  if(q) list = list.filter(c=>
+    (c.business_name||"").toLowerCase().includes(q) ||
+    (c.email||"").toLowerCase().includes(q) ||
+    (c.business_type||"").toLowerCase().includes(q));
+  $("tbody").innerHTML = list.length ? list.map(c=>{
+    const plan = c.plan || "trial";
+    const date = c.created_at ? new Date(c.created_at).toLocaleDateString("ar-SA") : "—";
+    return `<tr>
+      <td><b>${esc(c.business_name)}</b><span class="em">${esc(c.email)}</span></td>
+      <td>${esc(c.business_type||"—")}</td>
+      <td><span class="pill ${plan}">${esc(c.plan_label||PLAN_AR[plan]||plan)}</span></td>
+      <td>${c.connected ? '<span class="pill on"><span class="d"></span> مربوط</span>' : '<span class="pill gray"><span class="d"></span> غير مربوط</span>'}</td>
+      <td>${c.is_active ? '<span class="pill on"><span class="d"></span> يعمل</span>' : '<span class="pill off"><span class="d"></span> متوقف</span>'}</td>
+      <td>${fmt(c.conversations)}</td>
+      <td style="white-space:nowrap">${date}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="7" class="empty">لا نتائج مطابقة</td></tr>`;
+}
+
+// دخول تلقائي لو المفتاح محفوظ بالجلسة
+if(getKey()) load();
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

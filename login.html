@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تسجيل الدخول — واتس مخرج نجد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/svg+xml" href="logo-light.svg" />
+<style>
+:root{
+  --bg:#0A0C10; --card:#12161E; --line:#222938; --line2:#2B3446; --input:#0B0E14;
+  --text:#EEF3F9; --muted:#9AA7B8; --dim:#6B7789;
+  --accent:#C9621E; --accent2:#E8843D;
+  --err:#F85149; --ok:#3FB950;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:grid;place-items:center;padding:22px;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(760px 420px at 50% -8%, rgba(201,98,30,.14), transparent 60%),
+    radial-gradient(rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size:auto, 26px 26px}
+.wrap{width:100%;max-width:430px;position:relative;z-index:1}
+.logo-a{display:flex;justify-content:center;margin-bottom:28px}
+.logo-a svg{height:64px;width:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:34px 32px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.tabs{display:flex;background:var(--input);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:26px}
+.tab{flex:1;text-align:center;padding:11px;border-radius:9px;cursor:pointer;font-weight:700;color:var(--muted);transition:.2s;font-size:14.5px}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#160D04}
+h1{font-size:23px;font-weight:900;margin-bottom:6px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:22px;line-height:1.7}
+.field{margin-bottom:16px}
+label{display:block;font-size:13.5px;font-weight:700;margin-bottom:7px;color:var(--muted)}
+input,select{width:100%;padding:13px 14px;background:var(--input);border:1px solid var(--line);
+  border-radius:11px;color:var(--text);font-size:15px;transition:.2s;font-family:inherit}
+input::placeholder{color:var(--dim)}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,98,30,.18)}
+.pw-wrap{position:relative}
+.pw-wrap .eye{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;
+  color:var(--dim);cursor:pointer;font-size:16px;padding:4px}
+.pw-wrap .eye:hover{color:var(--accent2)}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#160D04;transition:.22s;margin-top:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(201,98,30,.32)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.msg{padding:12px 14px;border-radius:11px;font-size:14px;margin-bottom:16px;display:none;line-height:1.7}
+.msg.err{display:block;background:rgba(248,81,73,.1);color:var(--err);border:1px solid rgba(248,81,73,.3)}
+.msg.ok{display:block;background:rgba(63,185,80,.1);color:var(--ok);border:1px solid rgba(63,185,80,.3)}
+.hide{display:none}
+.trial-note{display:flex;align-items:center;justify-content:center;gap:7px;color:var(--dim);font-size:12.5px;margin-top:16px}
+.trial-note b{color:var(--muted)}
+.back{text-align:center;margin-top:20px}
+.back a{color:var(--muted);font-size:14px;text-decoration:none;transition:.2s}
+.back a:hover{color:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="logo-a" aria-label="NJD EXIT">
+    <svg viewBox="-20 -20 2244 1292"><path transform="translate(0,709) scale(1.0,-1.0)" d="M709 0H513L252 394V0H56V705H252L513 306V705H709Z" fill="#F2F5F9"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/><path transform="translate(0,1251.65) scale(0.85,-0.85)" d="M252 548V433H477V284H252V157H507V0H56V705H507V548Z" fill="#E8951F"/><path transform="translate(447.325,1251.65) scale(0.85,-0.85)" d="M497 0 360 199 243 0H20L249 361L12 705H243L376 511L490 705H713L487 350L728 0Z" fill="#E8951F"/><path transform="translate(1097.0,1251.65) scale(0.85,-0.85)" d="M0 705H360V590H278V115H360V0H0V115H82V590H0Z" fill="#E8951F"/><path transform="translate(1650.6,1251.65) scale(0.85,-0.85)" d="M587 705V549H399V0H203V549H17V705Z" fill="#E8951F"/><path transform="translate(825,709) scale(1.0,-1.0)" d="M523 705V238Q523 119 458.5 56.0Q394 -7 281 -7Q161 -7 89.5 60.0Q18 127 18 253H212Q213 170 273 170Q327 170 327 238V705Z" fill="#F2F5F9"/><path transform="translate(1469,709) scale(1.0,-1.0)" d="M703 353Q703 251 657.5 171.0Q612 91 528.5 45.5Q445 0 335 0H56V705H335Q446 705 529.5 660.5Q613 616 658.0 536.0Q703 456 703 353ZM504 353Q504 440 455.0 487.5Q406 535 320 535H252V173H320Q406 173 455.0 220.0Q504 267 504 353Z" fill="#F2F5F9"/></svg>
+  </a>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" id="tabLogin" onclick="switchTab('login')">تسجيل الدخول</div>
+      <div class="tab" id="tabSignup" onclick="switchTab('signup')">حساب جديد</div>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <!-- تسجيل الدخول -->
+    <form id="loginForm" onsubmit="return doLogin(event)">
+      <h1>مرحباً بعودتك 👋</h1>
+      <p class="sub">سجّل دخولك وتابع مساعدك من لوحة التحكم.</p>
+      <div class="field"><label>البريد الإلكتروني</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" required /></div>
+      <div class="field"><label>كلمة المرور</label>
+        <div class="pw-wrap">
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required />
+          <button type="button" class="eye" onclick="togglePw('loginPassword',this)">👁</button>
+        </div></div>
+      <button class="btn" type="submit" id="loginBtn">دخول</button>
+    </form>
+
+    <!-- حساب جديد -->
+    <form id="signupForm" class="hide" onsubmit="return doSignup(event)">
+      <h1>أنشئ حسابك</h1>
+      <p class="sub">دقيقة واحدة، وتبدأ تجربتك المجانية — ١٤ يوماً كاملة المزايا.</p>
+      <div class="field"><label>اسم النشاط</label>
+        <input type="text" id="suName" placeholder="مثال: مطعم سلمى" required /></div>
+      <div class="field"><label>نوع النشاط</label>
+        <select id="suType">
+          <option value="مطعم">مطعم أو كافيه</option>
+          <option value="صالون">صالون تجميل</option>
+          <option value="عيادة">عيادة أو مركز صحي</option>
+          <option value="محل">متجر أو محل</option>
+          <option value="أخرى">نشاط آخر</option>
+        </select></div>
+      <div class="field"><label>البريد الإلكتروني</label>
+        <input type="email" id="suEmail" placeholder="you@example.com" autocomplete="email" required /></div>
+      <div class="field"><label>كلمة المرور</label>
+        <div class="pw-wrap">
+          <input type="password" id="suPassword" placeholder="6 أحرف على الأقل" minlength="6" autocomplete="new-password" required />
+          <button type="button" class="eye" onclick="togglePw('suPassword',this)">👁</button>
+        </div></div>
+      <button class="btn" type="submit" id="signupBtn">إنشاء الحساب وبدء التجربة</button>
+      <div class="trial-note">🔒 بلا بطاقة ائتمانية · <b>إلغاء في أي وقت</b></div>
+    </form>
+  </div>
+
+  <div class="back"><a href="index.html">← الرجوع للصفحة الرئيسية</a></div>
+</div>
+
+<script>
+const API = "https://nnujud.app.n8n.cloud/webhook"; // محرّك n8n
+
+function showMsg(text, type){
+  const m = document.getElementById('msg');
+  m.textContent = text;
+  m.className = 'msg ' + type;
+}
+function clearMsg(){ document.getElementById('msg').className = 'msg'; }
+
+function togglePw(id, btn){
+  const i = document.getElementById(id);
+  i.type = i.type === 'password' ? 'text' : 'password';
+  btn.textContent = i.type === 'password' ? '👁' : '🙈';
+}
+
+function switchTab(which){
+  clearMsg();
+  const login = which === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', login);
+  document.getElementById('tabSignup').classList.toggle('active', !login);
+  document.getElementById('loginForm').classList.toggle('hide', !login);
+  document.getElementById('signupForm').classList.toggle('hide', login);
+}
+
+// فتح تبويب التسجيل عبر #signup
+if (location.hash === '#signup') switchTab('signup');
+
+function saveSession(clientId, businessName){
+  localStorage.setItem('client_id', clientId);
+  if (businessName) localStorage.setItem('business_name', businessName);
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  clearMsg();
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'جارٍ الدخول...';
+  try{
+    const res = await fetch(API + '/api/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email: document.getElementById('loginEmail').value.trim(),
+        password: document.getElementById('loginPassword').value
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success){
+      saveSession(data.client_id, data.business_name);
+      window.location.href = 'dashboard.html';
+    } else {
+      showMsg(data.error || 'تعذّر تسجيل الدخول — تأكد من البريد وكلمة المرور', 'err');
+    }
+  }catch(err){
+    showMsg('خطأ في الاتصال بالخادم. حاول مرة أخرى.', 'err');
+  }finally{
+    btn.disabled = false; btn.textContent = 'دخول';
+  }
+  return false;
+}
+
+async function doSignup(e){
+  e.preventDefault();
+  clearMsg();
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'جارٍ الإنشاء...';
+  try{
+    const res = await fetch(API + '/api/signup', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        business_name: document.getElementById('suName').value.trim(),
+        business_type: document.getElementById('suType').value,
+        email: document.getElementById('suEmail').value.trim(),
+        password: document.getElementById('suPassword').value
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success){
+      saveSession(data.client_id, document.getElementById('suName').value.trim());
+      window.location.href = 'dashboard.html';
+    } else {
+      showMsg(data.error || 'تعذّر إنشاء الحساب', 'err');
+    }
+  }catch(err){
+    showMsg('خطأ في الاتصال بالخادم. حاول مرة أخرى.', 'err');
+  }finally{
+    btn.disabled = false; btn.textContent = 'إنشاء الحساب وبدء التجربة';
+  }
+  return false;
+}
+</script>
+</body>
+</html>
